@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:botanybase/features/random_plant_entity.dart';
 import 'package:botanybase/services/plant_api_service.dart';
 import 'package:botanybase/features/plant_list_page.dart';
+import 'package:botanybase/features/plant_details_page.dart';
 
 class RandomPlantPage extends StatefulWidget {
   const RandomPlantPage({super.key});
@@ -277,6 +278,37 @@ class _RandomPlantPageState extends State<RandomPlantPage> {
                         height: 1.05,
                         fontWeight: FontWeight.w900,
                         letterSpacing: -1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                PlantDetailsPage(plantId: plant.id),
+                          ),
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.white54),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                      ),
+                      child: const Text(
+                        'LEARN MORE',
+                        style: TextStyle(
+                          fontSize: 12,
+                          letterSpacing: 2.0,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                     const SizedBox(
