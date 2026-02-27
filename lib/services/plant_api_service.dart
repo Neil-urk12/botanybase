@@ -1,33 +1,44 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../features/random_plant_entity.dart';
+import 'dio_client.dart';
+import 'exceptions.dart';
 
 class PlantApiService {
-  final Dio _dio;
+  final DioClient _dioClient;
 
-  PlantApiService({Dio? dio}) : _dio = dio ?? Dio();
+  PlantApiService({DioClient? dioClient})
+    : _dioClient = dioClient ?? DioClient();
 
-  Future<void> fetchSpeciesList() async {
-    final String apiKey = dotenv.env['API_KEY'] ?? '';
-    const String url = 'https://perenual.com/api/v2/species-list';
-
+  Future<List<RandomPlantEntity>> fetchSpeciesList() async {
     try {
-      final response = await _dio.get(url, queryParameters: {'key': apiKey});
+      final response = await _dioClient.dio.get('species-list');
 
       if (response.statusCode == 200) {
-        print(response.data); // data contains the parsed JSON map or string
+        // Parse the 'data' array from the JSON response into a list of entities
+        final List<dynamic> rawData = response.data['data'] ?? [];
+        return rawData
+            .map(
+              (json) =>
+                  RandomPlantEntity.fromJson(json as Map<String, dynamic>),
+            )
+            .toList();
       } else {
-        print(response.statusMessage);
+        throw ServerException(
+          response.statusMessage ?? 'Failed to load species list.',
+          statusCode: response.statusCode,
+        );
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        print(
-          'Error response: ${e.response?.statusCode} - ${e.response?.statusMessage}',
+        throw ServerException(
+          e.response?.statusMessage ?? 'Server returned an error',
+          statusCode: e.response?.statusCode,
         );
       } else {
-        print('Error request: ${e.message}');
+        throw NetworkException('Failed to connect to the server: ${e.message}');
       }
     } catch (e) {
-      print('Unexpected error: $e');
+      throw Exception('An unexpected error occurred: $e');
     }
   }
 }
