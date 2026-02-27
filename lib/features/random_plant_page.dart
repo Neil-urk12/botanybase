@@ -4,6 +4,7 @@ import 'package:botanybase/features/random_plant_entity.dart';
 import 'package:botanybase/services/plant_api_service.dart';
 import 'package:botanybase/features/plant_list_page.dart';
 import 'package:botanybase/features/plant_details_page.dart';
+import 'package:botanybase/features/pest_disease_list_page.dart';
 
 class RandomPlantPage extends StatefulWidget {
   const RandomPlantPage({super.key});
@@ -64,22 +65,44 @@ class _RandomPlantPageState extends State<RandomPlantPage> {
           Positioned(
             top: MediaQuery.of(context).padding.top + 16,
             right: 24,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.search, color: Colors.white),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PlantListPage(),
-                    ),
-                  );
-                },
-              ),
+            child: Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.healing_outlined, color: Colors.white),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PestDiseaseListPage(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.search, color: Colors.white),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PlantListPage(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           if (!_isLoading && _errorMessage == null)
