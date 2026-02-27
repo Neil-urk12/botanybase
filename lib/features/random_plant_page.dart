@@ -2,7 +2,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:botanybase/features/random_plant_entity.dart';
 import 'package:botanybase/services/plant_api_service.dart';
+import 'package:botanybase/services/weather_api_service.dart';
 import 'package:botanybase/features/plant_list_page.dart';
+
 import 'package:botanybase/features/plant_details_page.dart';
 import 'package:botanybase/features/pest_disease_list_page.dart';
 
@@ -15,15 +17,31 @@ class RandomPlantPage extends StatefulWidget {
 
 class _RandomPlantPageState extends State<RandomPlantPage> {
   final PlantApiService _apiService = PlantApiService();
+  final WeatherApiService _weatherApiService = WeatherApiService();
   List<RandomPlantEntity> _plants = [];
   RandomPlantEntity? _currentPlant;
   bool _isLoading = true;
   String? _errorMessage;
+  double? _avgRainfall;
 
   @override
   void initState() {
     super.initState();
     _fetchPlants();
+    _fetchWeather();
+  }
+
+  Future<void> _fetchWeather() async {
+    try {
+      final avg = await _weatherApiService.fetchAverageRainfall();
+      if (mounted) {
+        setState(() {
+          _avgRainfall = avg;
+        });
+      }
+    } catch (e) {
+      // Gracefully ignore weather errors
+    }
   }
 
   Future<void> _fetchPlants() async {
@@ -73,7 +91,10 @@ class _RandomPlantPageState extends State<RandomPlantPage> {
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
-                    icon: const Icon(Icons.healing_outlined, color: Colors.white),
+                    icon: const Icon(
+                      Icons.healing_outlined,
+                      color: Colors.white,
+                    ),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -257,40 +278,81 @@ class _RandomPlantPageState extends State<RandomPlantPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.15),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            plant.isIndoor
-                                ? Icons.home_outlined
-                                : Icons.park_outlined,
-                            color: Colors.white,
-                            size: 16,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            plant.isIndoor ? 'INDOOR' : 'OUTDOOR',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 2.0,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.15),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                plant.isIndoor
+                                    ? Icons.home_outlined
+                                    : Icons.park_outlined,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                plant.isIndoor ? 'INDOOR' : 'OUTDOOR',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 2.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (_avgRainfall != null) ...[
+                          const SizedBox(width: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.15),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.water_drop_outlined,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${_avgRainfall!.toStringAsFixed(1)} MM',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 2.0,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
-                      ),
+                      ],
                     ),
                     const SizedBox(height: 24),
                     Text(
