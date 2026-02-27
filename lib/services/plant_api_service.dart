@@ -9,9 +9,14 @@ class PlantApiService {
   PlantApiService({DioClient? dioClient})
     : _dioClient = dioClient ?? DioClient();
 
-  Future<List<RandomPlantEntity>> fetchSpeciesList() async {
+  Future<List<RandomPlantEntity>> fetchSpeciesList({String? query}) async {
     try {
-      final response = await _dioClient.dio.get('species-list');
+      final Map<String, dynamic>? queryParameters =
+          (query != null && query.isNotEmpty) ? {'q': query} : null;
+      final response = await _dioClient.dio.get(
+        'species-list',
+        queryParameters: queryParameters,
+      );
 
       if (response.statusCode == 200) {
         // Parse the 'data' array from the JSON response into a list of entities
