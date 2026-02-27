@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:botanybase/features/random_plant_entity.dart';
 import 'package:botanybase/services/plant_api_service.dart';
+import 'package:botanybase/features/plant_details_page.dart';
 
 class PlantListPage extends StatefulWidget {
   const PlantListPage({super.key});
@@ -162,80 +163,90 @@ class _PlantListPageState extends State<PlantListPage> {
   }
 
   Widget _buildListItem(RandomPlantEntity plant) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-              ),
-              color: const Color(0xFF1A1A1A),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: plant.imageUrl.isNotEmpty
-                ? Image.network(
-                    plant.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        _buildPlaceholderIcon(),
-                  )
-                : _buildPlaceholderIcon(),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PlantDetailsPage(plantId: plant.id),
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        plant.isIndoor
-                            ? Icons.home_outlined
-                            : Icons.park_outlined,
-                        color: Colors.white54,
-                        size: 14,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        plant.isIndoor ? 'INDOOR' : 'OUTDOOR',
-                        style: const TextStyle(
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.03),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  bottomLeft: Radius.circular(20),
+                ),
+                color: const Color(0xFF1A1A1A),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: plant.imageUrl.isNotEmpty
+                  ? Image.network(
+                      plant.imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          _buildPlaceholderIcon(),
+                    )
+                  : _buildPlaceholderIcon(),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          plant.isIndoor
+                              ? Icons.home_outlined
+                              : Icons.park_outlined,
                           color: Colors.white54,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.5,
+                          size: 14,
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    plant.name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: -0.5,
+                        const SizedBox(width: 6),
+                        Text(
+                          plant.isIndoor ? 'INDOOR' : 'OUTDOOR',
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                      ],
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text(
+                      plant.name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.5,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
